@@ -29,4 +29,3 @@ npm-debug.log.*
 *.scss.d.ts
 /dump.rdb
 /.vscode
-.env
