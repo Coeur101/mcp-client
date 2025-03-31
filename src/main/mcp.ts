@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'node:fs';
 import { app } from 'electron';
 import { IMCPConfig, IMCPServer } from 'types/mcp';
-import { isUndefined, omitBy } from 'lodash';
+import { clone, cloneDeep, isUndefined, omitBy } from 'lodash';
 import * as logging from './logging';
 
 export const DEFAULT_INHERITED_ENV_VARS =
@@ -177,10 +177,18 @@ export default class ModuleContext {
     try {
       const config = await this.getConfig();
       const mcpSvr = this.getMCPServer(server, config) as IMCPServer;
+
       const { key, command, args, env } = mcpSvr;
       let cmd: string = command;
+      let cmdArgs: string[] = cloneDeep(args)
       if (command === 'npx') {
-        cmd = process.platform === 'win32' ? `${command}.cmd` : command;
+        if (process.platform === 'win32') {
+          cmd = 'cmd';
+          cmdArgs.unshift('npx');
+          cmdArgs.unshift('/c')
+        } else {
+          cmd = command;
+        }
       }
       const mergedEnv = {
         ...getDefaultEnvironment(),
@@ -198,7 +206,7 @@ export default class ModuleContext {
       );
       const transport = new this.Transport({
         command: cmd,
-        args,
+        args: cmdArgs,
         stderr: process.platform === 'win32' ? 'pipe' : 'inherit',
         env: mergedEnv,
       });

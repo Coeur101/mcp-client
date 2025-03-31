@@ -204,3 +204,6 @@ contextBridge.exposeInMainWorld('envVars', envVars);
 
 export type ElectronHandler = typeof electronHandler;
 export type EnvVars = typeof envVars;
+export {
+  envVars
+}
