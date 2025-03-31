@@ -17,7 +17,7 @@ import {
   Dismiss24Regular,
   SubtractCircleRegular,
   Edit12Regular,
-  CheckmarkRegular
+  CheckmarkRegular,
 } from '@fluentui/react-icons';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -52,7 +52,7 @@ export default function ToolEditDialog(options: {
   const [description, setDescription] = useState('');
   const [command, setCommand] = useState('');
   const [envName, setEnvName] = useState('');
-  const [editStatus,setEditStatus] = useState<boolean>(false);
+  const [editStatus, setEditStatus] = useState<boolean>(false);
   const [envValue, setEnvValue] = useState('');
   const [editEnvValue, setEditEnvValue] = useState('');
   const [env, setEnv] = useState<{ [key: string]: string }>({});
@@ -119,17 +119,17 @@ export default function ToolEditDialog(options: {
   const editEnv = (envKey: string) => {
     setEditEnvValue(env[envKey]);
     setEditStatus(!editStatus);
-  }
+  };
 
   const sucessEdit = (envKey: string) => {
     setEnv((_env) => {
-      const newEnv = {..._env };
+      const newEnv = { ..._env };
       delete newEnv[envKey];
       newEnv[envKey.trim()] = editEnvValue.trim();
       return newEnv;
     });
-    setEditStatus(!editStatus)
-  }
+    setEditStatus(!editStatus);
+  };
 
   const submit = useCallback(async () => {
     let isValid = true;
@@ -165,7 +165,7 @@ export default function ToolEditDialog(options: {
       setDescription(server.description || '');
       setCommand([server.command, ...(server.args || [])].join(' '));
       setEnv(server.env || {});
-      setEditStatus(false)
+      setEditStatus(false);
     }
 
     return () => {
@@ -175,7 +175,7 @@ export default function ToolEditDialog(options: {
       setCommand('');
       setEnvName('');
       setEnvValue('');
-      setEditEnvValue('')
+      setEditEnvValue('');
       setEnv({});
     };
   }, [open, server]);
@@ -333,11 +333,10 @@ export default function ToolEditDialog(options: {
                         >
                           <div className="w-5/12 px-2 text-xs overflow-hidden text-nowrap truncate">
                             {envKey}
-
                           </div>
                           <div className="w-6/12 px-2 text-xs overflow-hidden text-nowrap truncate">
-                            {
-                              editStatus ? <Input
+                            {editStatus ? (
+                              <Input
                                 className="w-full"
                                 size="small"
                                 value={editEnvValue || ''}
@@ -347,28 +346,27 @@ export default function ToolEditDialog(options: {
                                 ) => {
                                   setEditEnvValue(data.value);
                                 }}
-                                /> : env[envKey]
-                            }
-
-                          </div>
-                          <div className='flex justify-between'>
-                            {
-                              env[envKey] && !editStatus ? <Button
-                              appearance="subtle"
-                                onClick={() =>
-                                editEnv(envKey)
-                              }
-                              icon={<Edit12Regular />}
-                              size="small"
-                              /> : <Button
-                              appearance="subtle"
-                                onClick={() =>
-                                sucessEdit(envKey)
-                              }
-                              icon={<CheckmarkRegular />}
-                              size="small"
                               />
-                            }
+                            ) : (
+                              env[envKey]
+                            )}
+                          </div>
+                          <div className="flex justify-between">
+                            {env[envKey] && !editStatus ? (
+                              <Button
+                                appearance="subtle"
+                                onClick={() => editEnv(envKey)}
+                                icon={<Edit12Regular />}
+                                size="small"
+                              />
+                            ) : (
+                              <Button
+                                appearance="subtle"
+                                onClick={() => sucessEdit(envKey)}
+                                icon={<CheckmarkRegular />}
+                                size="small"
+                              />
+                            )}
                             <Button
                               appearance="subtle"
                               icon={<SubtractCircleRegular />}

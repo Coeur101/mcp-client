@@ -139,15 +139,17 @@ export default class ModuleContext {
 
   public async load() {
     const { servers } = await this.getConfig();
-    await Promise.all(servers.map(async (server: IMCPServer) => {
-      if (server.isActive) {
-        logging.debug('Activating server:', server.key);
-        const { error } = await this.activate(server);
-        if (error) {
-          logging.error('Failed to activate server:', server.key, error);
+    await Promise.all(
+      servers.map(async (server: IMCPServer) => {
+        if (server.isActive) {
+          logging.debug('Activating server:', server.key);
+          const { error } = await this.activate(server);
+          if (error) {
+            logging.error('Failed to activate server:', server.key, error);
+          }
         }
-      }
-    }));
+      }),
+    );
   }
 
   public async addServer(server: IMCPServer) {
@@ -180,12 +182,12 @@ export default class ModuleContext {
 
       const { key, command, args, env } = mcpSvr;
       let cmd: string = command;
-      let cmdArgs: string[] = cloneDeep(args)
+      const cmdArgs: string[] = cloneDeep(args);
       if (command === 'npx') {
         if (process.platform === 'win32') {
           cmd = 'cmd';
           cmdArgs.unshift('npx');
-          cmdArgs.unshift('/c')
+          cmdArgs.unshift('/c');
         } else {
           cmd = command;
         }
@@ -258,15 +260,17 @@ export default class ModuleContext {
         return tool;
       });
     } else {
-      await Promise.all(Object.keys(this.clients).map(async (clientName:string) => {
-        const { tools } = await this.clients[clientName].listTools();
-        allTools = allTools.concat(
-          tools.map((tool: any) => {
-            tool.name = `${clientName}--${tool.name}`;
-            return tool;
-          }),
-        );
-      }));
+      await Promise.all(
+        Object.keys(this.clients).map(async (clientName: string) => {
+          const { tools } = await this.clients[clientName].listTools();
+          allTools = allTools.concat(
+            tools.map((tool: any) => {
+              tool.name = `${clientName}--${tool.name}`;
+              return tool;
+            }),
+          );
+        }),
+      );
     }
     // logging.debug('All Tools:', JSON.stringify(allTools, null, 2));
     return allTools;
